@@ -11,13 +11,18 @@ use Moose;
 extends 'DataFlow::Proc';
 
 use namespace::autoclean;
-use DataFlow::Util::HTTPGet;
+use LWP::UserAgent;
 
-has '_get' => (
+has 'ua' => (
     'is'      => 'ro',
-    'isa'     => 'DataFlow::Util::HTTPGet',
+    'isa'     => 'LWP::UserAgent',
     'lazy'    => 1,
-    'default' => sub { DataFlow::Util::HTTPGet->new }
+    'default' => sub { LWP::UserAgent->new( $_[0]->ua_options ) }
+);
+
+has 'ua_options' => (
+    'is'  => 'ro',
+    'isa' => 'Any',
 );
 
 has 'baseurl' => (
@@ -36,8 +41,10 @@ has '+p' => (
               ? URI->new_abs( $_, $self->baseurl )->as_string
               : $_;
 
-            #$self->debug("process_item:: url = $url");
-            return $self->_get->get($url);
+            return $self->ua->get($url)->decoded_content;
+
+            # TODO allow ArrayRef's instead of Str, and use the other elements
+            #      as parameters for the get() method
         };
     },
 );
