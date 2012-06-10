@@ -12,6 +12,7 @@ extends 'DataFlow::Proc';
 
 use namespace::autoclean;
 use LWP::UserAgent;
+use URI;
 
 has 'ua' => (
     'is'      => 'ro',
